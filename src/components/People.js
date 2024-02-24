@@ -6,7 +6,7 @@ export default function People() {
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedPerson, setSelectedPerson] = useState(null);
+  // const [selectedPerson, setSelectedPerson] = useState(null); // Removed
   const [personDetails, setPersonDetails] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const itemsPerPage = 9; // 3 rows x 3 columns = 9 items per page
