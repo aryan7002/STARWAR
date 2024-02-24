@@ -49,25 +49,38 @@ export default function Planets() {
     setCurrentPage(currentPage + 1);
   };
 
-  // Function to handle "Know More" button click
-  // Function to handle "Know More" button click
-  const handleKnowMore = async (planet) => {
-    try {
-      const residentsPromises = planet.residents.map(async (residentUrl) => {
-        const response = await fetch(residentUrl);
-        const residentData = await response.json();
-        return residentData.name;
-      });
-      
-      const residentsNames = await Promise.all(residentsPromises);
-      
-      const planetDetailsWithResidents = { ...planet, residents: residentsNames };
-      setPlanetDetails(planetDetailsWithResidents);
-      setModalOpen(true);
-    } catch (error) {
-      console.error('Error fetching planet details:', error);
-    }
-  };
+// Function to handle "Know More" button click
+const handleKnowMore = async (planet) => {
+  try {
+    const residentsPromises = planet.residents.map(async (residentUrl) => {
+      const response = await fetch(residentUrl);
+      const residentData = await response.json();
+      return residentData.name;
+    });
+    
+    const residentsNames = await Promise.all(residentsPromises);
+    
+    const filmsPromises = planet.films.map(async (filmUrl) => {
+      const response = await fetch(filmUrl);
+      const filmData = await response.json();
+      return filmData.title;
+    });
+    
+    const filmsNames = await Promise.all(filmsPromises);
+    
+    const planetDetailsWithResidentsAndFilms = { 
+      ...planet, 
+      residents: residentsNames,
+      films: filmsNames
+    };
+    
+    setPlanetDetails(planetDetailsWithResidentsAndFilms);
+    setModalOpen(true);
+  } catch (error) {
+    console.error('Error fetching planet details:', error);
+  }
+};
+
 
 
   // Function to close the modal
@@ -115,23 +128,27 @@ export default function Planets() {
         <Button disabled={currentPage === totalPages} onClick={handleNextPage} id='button'>
           Next
         </Button>
-        <span style={{ margin: '0 10px' }}>Page {currentPage} of {totalPages}</span>
+        <span style={{ margin: '0 10px' }} id='heading4'>Page {currentPage} of {totalPages}</span>
       </div>
 
-      {/* Modal for displaying planet details */}
-      {planetDetails && (
-        <Modal open={modalOpen} onClose={handleCloseModal} id='model1'>
-          <Modal.Header id='heading3'>{planetDetails.name}</Modal.Header>
-          <Modal.Content id='heading3'>
-            {Object.entries(planetDetails).map(([key, value]) => (
-              <p key={key}><strong>{key}:</strong> {value}</p>
-            ))}
-          </Modal.Content>
-          <Modal.Actions id='heading3'>
-            <Button onClick={handleCloseModal} id='button'>Close</Button>
-          </Modal.Actions>
-        </Modal>
-      )}
+      
+    {planetDetails && (
+      <Modal open={modalOpen} onClose={handleCloseModal} id='model1'>
+        <Modal.Header id='heading3'>{planetDetails.name}</Modal.Header>
+        <Modal.Content id='heading3'>
+          {Object.entries(planetDetails).map(([key, value]) => {
+            if (key === "residents" && Array.isArray(value)) {
+            value = value.join(", "); // Join resident names with comma separator
+          }
+          return <p key={key}><strong>{key}:</strong> {value}</p>;
+          })}
+        </Modal.Content>
+        <Modal.Actions id='heading3'>
+          <Button onClick={handleCloseModal} id='button'>Close</Button>
+        </Modal.Actions>
+      </Modal>
+    )}
+
     </>
   );
 }

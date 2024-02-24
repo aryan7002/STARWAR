@@ -47,17 +47,67 @@ export default function People() {
     setCurrentPage(currentPage + 1);
   };
 
-  // Function to handle "Know More" button click
-  const handleKnowMore = async (person) => {
-    try {
-      const response = await fetch(person.url);
-      const data = await response.json();
-      setPersonDetails(data);
-      setModalOpen(true);
-    } catch (error) {
-      console.error('Error fetching person details:', error);
-    }
-  };
+// Function to handle "Know More" button click
+const handleKnowMore = async (person) => {
+  try {
+    const response = await fetch(person.url);
+    const data = await response.json();
+
+    // Fetch planet data using the homeworld URL
+    const planetResponse = await fetch(data.homeworld);
+    const planetData = await planetResponse.json();
+    // Replace planet URL with planet name
+    data.homeworld = planetData.name;
+
+    // Fetch film data using the URLs in the films array
+    const filmsData = await Promise.all(data.films.map(async (filmUrl) => {
+      const filmResponse = await fetch(filmUrl);
+      const filmData = await filmResponse.json();
+      return filmData.title;
+    }));
+
+    // Replace film URLs with film names in the person details
+    data.films = filmsData;
+
+    // Fetch species data using the URLs in the species array
+    const speciesData = await Promise.all(data.species.map(async (speciesUrl) => {
+      const speciesResponse = await fetch(speciesUrl);
+      const speciesData = await speciesResponse.json();
+      return speciesData.name;
+    }));
+
+    // Replace species URLs with species names in the person details
+    data.species = speciesData;
+
+    // Fetch vehicles data using the URLs in the vehicles array
+    const vehiclesData = await Promise.all(data.vehicles.map(async (vehicleUrl) => {
+      const vehicleResponse = await fetch(vehicleUrl);
+      const vehicleData = await vehicleResponse.json();
+      return vehicleData.name;
+    }));
+
+    // Replace vehicle URLs with vehicle names in the person details
+    data.vehicles = vehiclesData;
+
+    // Fetch starships data using the URLs in the starships array
+    const starshipsData = await Promise.all(data.starships.map(async (starshipUrl) => {
+      const starshipResponse = await fetch(starshipUrl);
+      const starshipData = await starshipResponse.json();
+      return starshipData.name;
+    }));
+
+    // Replace starship URLs with starship names in the person details
+    data.starships = starshipsData;
+
+    setPersonDetails(data);
+    setModalOpen(true);
+  } catch (error) {
+    console.error('Error fetching person details:', error);
+  }
+};
+
+
+
 
   // Function to close the modal
   const handleCloseModal = () => {
@@ -104,7 +154,7 @@ export default function People() {
         <Button disabled={currentPage === totalPages} onClick={handleNextPage} id="button">
           Next
         </Button>
-        <span style={{ margin: '0 10px' }}>Page {currentPage} of {totalPages}</span>
+        <span style={{ margin: '0 10px' }} id='heading4'>Page {currentPage} of {totalPages}</span>
       </div>
 
       {/* Modal for displaying person details */}
